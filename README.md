@@ -43,7 +43,7 @@ If everything goes well you should see the expanded data:
 The Qt4 pretty printers from KDevelop[0] are not fully compatible with Qt5. For
 instance, the latest version (from December 2014) does not properly handle
 QByteArray. While these qt5printers are compatible with Qt5, it conflicts with
-Qt4.
+Qt4 (for example, QByteArray changed in Qt 5 from Qt 4 in this commit[1]).
 
 See also:
 
@@ -56,3 +56,4 @@ For the applicable licenses, see the headers of the files and refer to the Qt5
 sources at https://code.qt.io/cgit/qt/qtbase.git/tree/.
 
  [0]: https://projects.kde.org/projects/extragear/kdevelop/kdevelop/repository/revisions/master/show/debuggers/gdb/printers
+ [1]: https://code.qt.io/cgit/qt/qtbase.git/commit/src/corelib/tools/qbytearray.h?id=ad35a41739c8e1fb6db62ed37b764448b2e59ece
