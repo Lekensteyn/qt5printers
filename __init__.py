@@ -40,7 +40,7 @@
 #############################################################################
 
 import gdb.printing
-import core
+from . import core
 
 """Qt5 Pretty Printers for GDB.
 

@@ -41,7 +41,7 @@
 
 import gdb.printing
 import itertools
-import typeinfo
+from . import typeinfo
 try:
     import urlparse
 except ImportError:
