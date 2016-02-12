@@ -482,7 +482,8 @@ class QListPrinter:
             else:
                 p = node
             self.offset += 1
-            return ((str(self.offset), p.cast(self.el_type)))
+            value = p.address.cast(self.el_type.pointer()).dereference()
+            return (str(self.offset), value)
 
         def next(self):
             return self.__next__()
