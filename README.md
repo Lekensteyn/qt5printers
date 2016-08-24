@@ -5,7 +5,7 @@ Qt5. These are authored by Alex Merry from the KDE project.
 
 ## Usage
 Copy the three Python files to `~/.gdb/qt5printers/` and add this to your
-`~/.gdbinit' (or execute it from an existing `gdb` session):
+`~/.gdbinit` (or execute it from an existing `gdb` session):
 
 
     python
