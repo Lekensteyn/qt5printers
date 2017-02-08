@@ -713,11 +713,11 @@ class QVariantPrinter:
     def __init__(self, val):
         self.val = val
 
-    def children(self):
+    def to_string(self):
         d = self.val['d']
         typ = int(d['type'])
         if typ == typeinfo.meta_type_unknown:
-            return [('type', 'invalid')]
+            return '<invalid type>'
 
         data = d['data']
 
@@ -725,7 +725,7 @@ class QVariantPrinter:
             typename = typeinfo.meta_type_names[typ]
             if typename in self._varmap:
                 field = self._varmap[typename]
-                return [('type', typename), ('data', data[field])]
+                return data[field]
 
             try:
                 if typename.endswith('*'):
@@ -734,7 +734,7 @@ class QVariantPrinter:
                     gdb_type = gdb.lookup_type(typename)
             except gdb.error:
                 # couldn't find any type information
-                return [('type', typename), ('data', data)]
+                return data
 
             if gdb_type.sizeof > data.type.sizeof:
                 is_pointer = True
@@ -745,7 +745,7 @@ class QVariantPrinter:
                 is_pointer = False
             else:
                 # couldn't figure out how the type is stored
-                return [('type', typename), ('data', data)]
+                return data['o'].cast(gdb_type)
 
             if is_pointer:
                 value = data['shared']['ptr'].reinterpret_cast(gdb_type.pointer())
@@ -754,13 +754,10 @@ class QVariantPrinter:
                 data_void = data['c'].address.reinterpret_cast(void_star)
                 value = data_void.reinterpret_cast(gdb_type.pointer())
 
-            return [('type', typename), ('data', value.referenced_value())]
+            return value.referenced_value()
         else:
             # custom type?
-            return [('type', typ), ('data', data)]
-
-    def to_string(self):
-        return None
+            return data
 
 class QVarLengthArrayPrinter:
     """Print a Qt5 QVarLengthArray"""
