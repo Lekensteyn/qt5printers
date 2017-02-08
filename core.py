@@ -389,6 +389,22 @@ class QHashPrinter:
     def display_hint(self):
         return 'map'
 
+class QJsonObjectPrinter:
+    """Print a Qt5 QJsonObject"""
+
+    def __init__(self, val):
+        # delegate everything to map
+        self.printer = QMapPrinter(gdb.parse_and_eval('((QJsonObject*){:})->toVariantMap()'.format(val.address)))
+
+    def children(self):
+        return self.printer.children()
+
+    def to_string(self):
+        return self.printer.to_string()
+
+    def display_hint(self):
+        return 'map'
+
 class QLatin1StringPrinter:
     """Print a Qt5 QLatin1String"""
 
@@ -892,6 +908,7 @@ def build_pretty_printer():
     pp.add_printer('QChar', '^QChar$', QCharPrinter)
     pp.add_printer('QDate', '^QDate$', QDatePrinter)
     pp.add_printer('QDateTime', '^QDateTime$', QDateTimePrinter)
+    pp.add_printer('QJsonObject', '^QJsonObject$', QJsonObjectPrinter)
     pp.add_printer('QLatin1String', '^QLatin1String$', QLatin1StringPrinter)
     pp.add_printer('QLinkedList', '^QLinkedList<.*>$', QLinkedListPrinter)
     pp.add_printer('QList', '^QList<.*>$', QListPrinter)
