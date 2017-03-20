@@ -389,6 +389,22 @@ class QHashPrinter:
     def display_hint(self):
         return 'map'
 
+class QJsonObjectPrinter:
+    """Print a Qt5 QJsonObject"""
+
+    def __init__(self, val):
+        # delegate everything to map
+        self.printer = QMapPrinter(gdb.parse_and_eval('((QJsonObject*){:})->toVariantMap()'.format(val.address)))
+
+    def children(self):
+        return self.printer.children()
+
+    def to_string(self):
+        return self.printer.to_string()
+
+    def display_hint(self):
+        return 'map'
+
 class QLatin1StringPrinter:
     """Print a Qt5 QLatin1String"""
 
@@ -713,11 +729,11 @@ class QVariantPrinter:
     def __init__(self, val):
         self.val = val
 
-    def children(self):
+    def to_string(self):
         d = self.val['d']
         typ = int(d['type'])
         if typ == typeinfo.meta_type_unknown:
-            return [('type', 'invalid')]
+            return '<invalid type>'
 
         data = d['data']
 
@@ -725,7 +741,7 @@ class QVariantPrinter:
             typename = typeinfo.meta_type_names[typ]
             if typename in self._varmap:
                 field = self._varmap[typename]
-                return [('type', typename), ('data', data[field])]
+                return data[field]
 
             try:
                 if typename.endswith('*'):
@@ -734,7 +750,7 @@ class QVariantPrinter:
                     gdb_type = gdb.lookup_type(typename)
             except gdb.error:
                 # couldn't find any type information
-                return [('type', typename), ('data', data)]
+                return data
 
             if gdb_type.sizeof > data.type.sizeof:
                 is_pointer = True
@@ -745,7 +761,7 @@ class QVariantPrinter:
                 is_pointer = False
             else:
                 # couldn't figure out how the type is stored
-                return [('type', typename), ('data', data)]
+                return data['o'].cast(gdb_type)
 
             if is_pointer:
                 value = data['shared']['ptr'].reinterpret_cast(gdb_type.pointer())
@@ -754,13 +770,10 @@ class QVariantPrinter:
                 data_void = data['c'].address.reinterpret_cast(void_star)
                 value = data_void.reinterpret_cast(gdb_type.pointer())
 
-            return [('type', typename), ('data', value.referenced_value())]
+            return value.referenced_value()
         else:
             # custom type?
-            return [('type', typ), ('data', data)]
-
-    def to_string(self):
-        return None
+            return data
 
 class QVarLengthArrayPrinter:
     """Print a Qt5 QVarLengthArray"""
@@ -895,6 +908,7 @@ def build_pretty_printer():
     pp.add_printer('QChar', '^QChar$', QCharPrinter)
     pp.add_printer('QDate', '^QDate$', QDatePrinter)
     pp.add_printer('QDateTime', '^QDateTime$', QDateTimePrinter)
+    pp.add_printer('QJsonObject', '^QJsonObject$', QJsonObjectPrinter)
     pp.add_printer('QLatin1String', '^QLatin1String$', QLatin1StringPrinter)
     pp.add_printer('QLinkedList', '^QLinkedList<.*>$', QLinkedListPrinter)
     pp.add_printer('QList', '^QList<.*>$', QListPrinter)
