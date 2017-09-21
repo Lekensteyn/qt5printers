@@ -201,6 +201,8 @@ def type_is_known_primitive(typ):
 
 def type_is_known_movable(typ):
     """Returns True if the given gdb type is known to be movable."""
+    if not typ.name:
+        return False
     pos = typ.name.find('<')
     if pos > 0:
         return typ.name[0:pos] in movable_tpl_types
@@ -209,6 +211,8 @@ def type_is_known_movable(typ):
 
 def type_is_known_static(typ):
     """Returns True if the given gdb type is known to be neither primitive nor movable."""
+    if not typ.name:
+        return False
     pos = typ.name.find('<')
     if pos > 0:
         return typ.name[0:pos] in static_tpl_types
