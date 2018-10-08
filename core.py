@@ -394,7 +394,7 @@ class QJsonObjectPrinter:
 
     def __init__(self, val):
         # delegate everything to map
-        self.printer = QMapPrinter(gdb.parse_and_eval('((QJsonObject*){:})->toVariantMap()'.format(val.address)))
+        self.printer = QMapPrinter(gdb.parse_and_eval('((QJsonObject*){:})->toVariantMap()'.format(int(val.address))))
 
     def children(self):
         return self.printer.children()
@@ -410,7 +410,7 @@ class QJsonArrayPrinter:
 
     def __init__(self, val):
         # delegate everything to list
-        self.printer = QListPrinter(gdb.parse_and_eval('((QJsonArray*){:})->toVariantList()'.format(val.address)))
+        self.printer = QListPrinter(gdb.parse_and_eval('((QJsonArray*){:})->toVariantList()'.format(int(val.address))))
 
     def children(self):
         return self.printer.children()
